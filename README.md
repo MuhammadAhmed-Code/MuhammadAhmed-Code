@@ -1,16 +1,40 @@
-## Hi there 👋
+# Hey there! I'm Muhammad Ahmed 👋
 
-<!--
-**MuhammadAhmed-Code/MuhammadAhmed-Code** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+> **CS Student @ SZABIST University, Karachi**
 
-Here are some ideas to get you started:
+Welcome to my GitHub! Here you'll find my university work and a bunch of small projects I've built along the way — explore around, hopefully something makes you go *"wait, that's actually cool"* 😄
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+---
+
+## 🎓 About Me
+
+- 🏫 **University:** SZABIST University, Karachi
+- 📚 **Program:** Bachelor of Science in Computer Science (BSCS)
+- 🏷️ **Section:** 4A
+- 🪪 **Roll Number:** 2412115
+- 📍 **Based in:** Karachi, Pakistan
+
+---
+
+## 🗂️ What's Here
+
+- **University Work** — Assignments, labs, and projects from my coursework
+- **Personal Projects** — Small builds that I experiment with on the side *(the ones that might just blow your mind 🤯)*
+
+---
+
+## 🛠️ Currently Learning
+
+- Core CS fundamentals
+- Programming & problem solving
+- Building things that actually work
+
+---
+
+## 📬 Get in Touch
+
+Feel free to explore, fork, or reach out if you find something interesting!
+
+---
+
+*Made with curiosity and too many cups of chai ☕*
