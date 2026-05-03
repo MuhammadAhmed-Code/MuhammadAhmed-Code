@@ -16,6 +16,14 @@
   <!-- Background 3D Canvas -->
   <canvas id="bg-canvas"></canvas>
 
+  <!-- Mobile Nav Overlay -->
+  <div class="mobile-nav" id="mobileNav">
+    <a href="#about"    onclick="closeMobileNav()">About</a>
+    <a href="#skills"   onclick="closeMobileNav()">Skills</a>
+    <a href="#projects" onclick="closeMobileNav()">Projects</a>
+    <a href="#contact"  onclick="closeMobileNav()">Contact</a>
+  </div>
+
   <!-- Navigation -->
   <nav>
     <div class="nav-logo">M<span>.</span>Ahmed</div>
@@ -25,6 +33,11 @@
       <a href="#projects">Projects</a>
       <a href="#contact">Contact</a>
     </div>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
   </nav>
 
   <!-- Hero Section -->
@@ -89,33 +102,45 @@
     <div class="skills-grid">
       <div class="skill-card">
         <div class="skill-icon">⚡</div>
-        <div class="skill-name">Programming</div>
-        <div class="skill-desc">C · C++ · Python · Java — core CS fundamentals</div>
+        <div>
+          <div class="skill-name">Programming</div>
+          <div class="skill-desc">C · C++ · Python · Java — core CS fundamentals</div>
+        </div>
       </div>
       <div class="skill-card">
         <div class="skill-icon">🌐</div>
-        <div class="skill-name">Web Dev</div>
-        <div class="skill-desc">HTML · CSS · JavaScript — building for the browser</div>
+        <div>
+          <div class="skill-name">Web Dev</div>
+          <div class="skill-desc">HTML · CSS · JavaScript — building for the browser</div>
+        </div>
       </div>
       <div class="skill-card">
         <div class="skill-icon">🗄️</div>
-        <div class="skill-name">Databases</div>
-        <div class="skill-desc">SQL fundamentals · data modelling basics</div>
+        <div>
+          <div class="skill-name">Databases</div>
+          <div class="skill-desc">SQL fundamentals · data modelling basics</div>
+        </div>
       </div>
       <div class="skill-card">
         <div class="skill-icon">🔧</div>
-        <div class="skill-name">Tools</div>
-        <div class="skill-desc">Git · VS Code · Linux CLI</div>
+        <div>
+          <div class="skill-name">Tools</div>
+          <div class="skill-desc">Git · VS Code · Linux CLI</div>
+        </div>
       </div>
       <div class="skill-card">
         <div class="skill-icon">🧠</div>
-        <div class="skill-name">CS Core</div>
-        <div class="skill-desc">DSA · OOP · OS concepts · Discrete Math</div>
+        <div>
+          <div class="skill-name">CS Core</div>
+          <div class="skill-desc">DSA · OOP · OS concepts · Discrete Math</div>
+        </div>
       </div>
       <div class="skill-card">
         <div class="skill-icon">🚀</div>
-        <div class="skill-name">Learning</div>
-        <div class="skill-desc">Always exploring — currently diving deeper into systems</div>
+        <div>
+          <div class="skill-name">Learning</div>
+          <div class="skill-desc">Always exploring — currently diving deeper into systems</div>
+        </div>
       </div>
     </div>
   </section>
@@ -176,12 +201,10 @@
   </section>
 
   <footer>
-    © 2024 Muhammad Ahmed · SZABIST Karachi · Built with curiosity &amp; too many cups of chai ☕
+    © 2024 Muhammad Ahmed &nbsp;·&nbsp; SZABIST Karachi &nbsp;·&nbsp; Built with curiosity &amp; too many cups of chai ☕
   </footer>
 
-  <!-- Three.js CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <!-- Main JS -->
   <script src="main.js"></script>
 
 </body>
