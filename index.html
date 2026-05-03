@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta id="meta-theme" name="theme-color" content="#000000">
+  <title>Muhammad Ahmed — Portfolio · 3D & Motion</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <div id="cursor" aria-hidden="true"></div>
+  <div id="cursor-ring" aria-hidden="true"></div>
+
+  <nav>
+    <a class="nav-logo" href="#hero">MA<span>.</span></a>
+    <div class="nav-right">
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#scene-section">3D Lab</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#projects">Work</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <button class="theme-toggle" type="button" id="theme-toggle" aria-label="Switch theme" title="Dark / Light">
+        <span class="theme-icon theme-icon-dark" aria-hidden="true">◐</span>
+        <span class="theme-icon theme-icon-light" aria-hidden="true">◑</span>
+      </button>
+      <button class="hamburger" type="button" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="mobile-nav" id="mobile-nav" aria-hidden="true">
+    <a href="#about">About</a>
+    <a href="#scene-section">3D Lab</a>
+    <a href="#skills">Skills</a>
+    <a href="#projects">Work</a>
+    <a href="#contact">Contact</a>
+  </div>
+
+  <section id="hero">
+    <div class="hero-inner" id="hero-inner">
+      <p class="hero-tag">Web Designer & Developer · Karachi</p>
+      <h1 class="hero-name">
+        Muhammad<br>
+        <span class="highlight">Ahmed</span>
+      </h1>
+      <p class="hero-sub">Interfaces that feel <em>alive</em> — motion, depth, and clarity built for every screen.</p>
+      <div class="hero-scroll">
+        <span class="scroll-line" aria-hidden="true"></span>
+        <span>Scroll to explore</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="about">
+    <div class="about-info">
+      <p class="section-label reveal">About</p>
+      <h2 class="big-text reveal">Design with depth.<br>Ship with precision.</h2>
+      <div style="margin-top:2rem">
+        <div class="info-row reveal">
+          <span class="info-label">Role</span>
+          <span class="info-value">Web Designer & Developer</span>
+        </div>
+        <div class="info-row reveal">
+          <span class="info-label">Focus</span>
+          <span class="info-value">3D web, UI systems, performance</span>
+        </div>
+        <div class="info-row reveal">
+          <span class="info-label">Location</span>
+          <span class="info-value">Karachi, Pakistan</span>
+        </div>
+      </div>
+    </div>
+    <div class="about-visual reveal">
+      <div class="about-visual-inner">
+        <strong>3D + motion</strong> is not decoration — it is hierarchy, emotion, and memory. This page uses a live WebGL field: neon volumes, orbiting shards, and lights that breathe with you.
+      </div>
+    </div>
+  </section>
+
+  <section id="scene-section">
+    <p class="scene-label reveal">Live scene</p>
+    <h2 class="scene-title reveal">A pocket universe —<br>spin, glow, repeat.</h2>
+    <div class="scene-stage reveal">
+      <div class="scene-stage-inner">
+        <canvas id="card-canvas"></canvas>
+      </div>
+    </div>
+    <p class="card-hint reveal">Drag to orbit · Scroll to zoom mood · Lights chase time</p>
+  </section>
+
+  <section id="skills">
+    <p class="section-label reveal">Capabilities</p>
+    <h2 class="big-text reveal">Tools that stay sharp<br>at any scale.</h2>
+    <div class="skills-grid">
+      <article class="skill-card reveal"><div class="skill-icon">◇</div><h3 class="skill-name">UI / UX</h3><p class="skill-desc">Systems, tokens, responsive rhythm.</p></article>
+      <article class="skill-card reveal"><div class="skill-icon">◎</div><h3 class="skill-name">3D & Motion</h3><p class="skill-desc">Three.js, shaders, scroll choreography.</p></article>
+      <article class="skill-card reveal"><div class="skill-icon">⬡</div><h3 class="skill-name">Frontend</h3><p class="skill-desc">Semantic HTML, modern CSS, a11y.</p></article>
+      <article class="skill-card reveal"><div class="skill-icon">▣</div><h3 class="skill-name">Performance</h3><p class="skill-desc">Lazy loads, GPU budgets, 60fps targets.</p></article>
+      <article class="skill-card reveal"><div class="skill-icon">◈</div><h3 class="skill-name">Creative code</h3><p class="skill-desc">Procedural visuals, canvas, WebGL.</p></article>
+      <article class="skill-card reveal"><div class="skill-icon">✦</div><h3 class="skill-name">Collaboration</h3><p class="skill-desc">Design handoff, clear documentation.</p></article>
+    </div>
+  </section>
+
+  <section id="projects">
+    <p class="section-label reveal">Selected</p>
+    <h2 class="big-text reveal">Work that stacks<br>in the real world.</h2>
+    <div class="projects-grid">
+      <article class="project-card reveal">
+        <span class="project-num">01</span>
+        <h3 class="project-title">Immersive product hub</h3>
+        <p class="project-desc">Narrative scroll, 3D hero, and modular case studies for a hardware launch.</p>
+        <div class="project-tags"><span class="tag">Three.js</span><span class="tag">GSAP</span></div>
+      </article>
+      <article class="project-card reveal">
+        <span class="project-num">02</span>
+        <h3 class="project-title">Design ops dashboard</h3>
+        <p class="project-desc">Dense data, calm UI — charts, roles, and dark-first ergonomics.</p>
+        <div class="project-tags"><span class="tag">React</span><span class="tag">D3</span></div>
+      </article>
+      <article class="project-card reveal">
+        <span class="project-num">03</span>
+        <h3 class="project-title">Portfolio OS</h3>
+        <p class="project-desc">Typography-led identity with live generative backdrop and cursor physics.</p>
+        <div class="project-tags"><span class="tag">WebGL</span><span class="tag">CSS 3D</span></div>
+      </article>
+      <article class="project-card reveal">
+        <span class="project-num">04</span>
+        <h3 class="project-title">Commerce micro-interactions</h3>
+        <p class="project-desc">Checkout flows with tactile feedback and optimistic motion.</p>
+        <div class="project-tags"><span class="tag">Motion</span><span class="tag">A11y</span></div>
+      </article>
+    </div>
+  </section>
+
+  <section id="contact">
+    <h2 class="contact-big reveal">Let’s build<br><span>the next layer.</span></h2>
+    <p class="contact-sub reveal">Tell me about your product, timeline, and the feeling you want people to remember.</p>
+    <div class="contact-links reveal">
+      <a class="contact-link primary" href="mailto:hello@example.com">Email me</a>
+      <a class="contact-link secondary" href="#" aria-label="LinkedIn (placeholder)">LinkedIn</a>
+    </div>
+  </section>
+
+  <footer>
+    <p>© <span id="y"></span> Muhammad Ahmed · Dark & light, depth, and a little chaos.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
