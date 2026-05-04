@@ -1,483 +1,381 @@
-(function () {
-  'use strict';
+/* ============================================
+   Muhammad Ahmed — Portfolio JavaScript
+   main.js
+   ============================================ */
 
-  var metaTheme = document.getElementById('meta-theme');
-  var themeBtn = document.getElementById('theme-toggle');
-  var THEME_KEY = 'portfolio-theme';
+/* ─────────────────────────────────────
+   HAMBURGER / MOBILE NAV
+───────────────────────────────────── */
+const hamburger  = document.getElementById('hamburger');
+const mobileNav  = document.getElementById('mobileNav');
 
-  function isLightTheme() {
-    return document.documentElement.getAttribute('data-theme') === 'light';
-  }
+hamburger.addEventListener('click', () => {
+  const isOpen = mobileNav.classList.toggle('open');
+  hamburger.classList.toggle('open', isOpen);
+  document.body.style.overflow = isOpen ? 'hidden' : '';
+});
 
-  function getStoredTheme() {
-    try {
-      return localStorage.getItem(THEME_KEY);
-    } catch (e) {
-      return null;
-    }
-  }
+function closeMobileNav() {
+  mobileNav.classList.remove('open');
+  hamburger.classList.remove('open');
+  document.body.style.overflow = '';
+}
 
-  function applyTheme(mode) {
-    var light = mode === 'light';
-    document.documentElement.setAttribute('data-theme', light ? 'light' : 'dark');
-    try {
-      localStorage.setItem(THEME_KEY, light ? 'light' : 'dark');
-    } catch (e) {}
-    if (metaTheme) {
-      metaTheme.setAttribute('content', light ? '#e8f2f3' : '#000000');
-    }
-    if (themeBtn) {
-      themeBtn.setAttribute('aria-label', light ? 'Switch to dark theme' : 'Switch to light theme');
-      themeBtn.setAttribute('title', light ? 'Dark mode' : 'Light mode');
-    }
-    window.dispatchEvent(new CustomEvent('portfoliotheme', { detail: { theme: light ? 'light' : 'dark' } }));
-  }
 
-  function initTheme() {
-    var stored = getStoredTheme();
-    if (stored === 'light' || stored === 'dark') {
-      applyTheme(stored);
-    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-      applyTheme('light');
-    } else {
-      applyTheme('dark');
-    }
-  }
+/* ─────────────────────────────────────
+   CUSTOM CURSOR (desktop only)
+───────────────────────────────────── */
+const cursor = document.getElementById('cursor');
+const ring   = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
 
-  initTheme();
-  if (themeBtn) {
-    themeBtn.addEventListener('click', function () {
-      applyTheme(isLightTheme() ? 'dark' : 'light');
+if (window.matchMedia('(hover: hover)').matches) {
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX;
+    my = e.clientY;
+  });
+
+  (function animCursor() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    cursor.style.transform = `translate(${mx - 5}px, ${my - 5}px)`;
+    ring.style.transform   = `translate(${rx - 18}px, ${ry - 18}px)`;
+    requestAnimationFrame(animCursor);
+  })();
+}
+
+
+/* ─────────────────────────────────────
+   BACKGROUND PARTICLE FIELD (Three.js)
+   Black & Cyan theme
+───────────────────────────────────── */
+(function initBackground() {
+  const canvas = document.getElementById('bg-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  const scene  = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
+  camera.position.z = 3;
+
+  /* Particle cloud */
+  const geo = new THREE.BufferGeometry();
+  const COUNT = 1800;
+  const pos = new Float32Array(COUNT * 3);
+  for (let i = 0; i < COUNT * 3; i++) pos[i] = (Math.random() - 0.5) * 22;
+  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+
+  const mat = new THREE.PointsMaterial({
+    color: 0x00ffe7,
+    size: 0.018,
+    transparent: true,
+    opacity: 0.25,
+  });
+  const points = new THREE.Points(geo, mat);
+  scene.add(points);
+
+  /* Floating wireframe shapes — cyan & dim cyan */
+  const shapes = [];
+  const geos = [
+    new THREE.OctahedronGeometry(0.28, 0),
+    new THREE.TetrahedronGeometry(0.28, 0),
+    new THREE.IcosahedronGeometry(0.22, 0),
+  ];
+  const colors = [0x00ffe7, 0x00b8a6, 0x008f82];
+
+  for (let i = 0; i < 10; i++) {
+    const g = geos[i % 3];
+    const m = new THREE.MeshBasicMaterial({
+      color: colors[i % 3],
+      wireframe: true,
+      transparent: true,
+      opacity: 0.1 + (i % 3) * 0.03,
     });
-  }
-
-  var yEl = document.getElementById('y');
-  if (yEl) {
-    yEl.textContent = String(new Date().getFullYear());
-  }
-
-  /* ── Mobile nav ── */
-  var ham = document.querySelector('.hamburger');
-  var mob = document.getElementById('mobile-nav');
-  if (ham && mob) {
-    var mobileLinks = mob.querySelectorAll('a');
-
-    function setMenu(open) {
-      ham.classList.toggle('open', open);
-      mob.classList.toggle('open', open);
-      ham.setAttribute('aria-expanded', open ? 'true' : 'false');
-      mob.setAttribute('aria-hidden', open ? 'false' : 'true');
-      document.body.style.overflow = open ? 'hidden' : '';
-    }
-
-    ham.addEventListener('click', function () {
-      setMenu(!mob.classList.contains('open'));
-    });
-    mobileLinks.forEach(function (a) {
-      a.addEventListener('click', function () {
-        setMenu(false);
-      });
-    });
-  }
-
-  /* ── Cursor (fine pointers only) ── */
-  var cursor = document.getElementById('cursor');
-  var ring = document.getElementById('cursor-ring');
-  var mx = 0;
-  var my = 0;
-  var rx = 0;
-  var ry = 0;
-  var finePointer = window.matchMedia('(pointer: fine)').matches;
-
-  if (finePointer && cursor && ring) {
-    document.addEventListener('mousemove', function (e) {
-      mx = e.clientX;
-      my = e.clientY;
-      cursor.style.transform = 'translate(' + (mx - 5) + 'px,' + (my - 5) + 'px)';
-    });
-    function loopRing() {
-      rx += (mx - rx) * 0.18;
-      ry += (my - ry) * 0.18;
-      ring.style.transform = 'translate(' + (rx - 20) + 'px,' + (ry - 20) + 'px)';
-      requestAnimationFrame(loopRing);
-    }
-    loopRing();
-    document.querySelectorAll('a, button, .skill-card, .project-card').forEach(function (el) {
-      el.addEventListener('mouseenter', function () {
-        ring.classList.add('hover');
-      });
-      el.addEventListener('mouseleave', function () {
-        ring.classList.remove('hover');
-      });
-    });
-  }
-
-  /* ── Hero tilt ── */
-  var heroInner = document.getElementById('hero-inner');
-  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (heroInner && finePointer && !reduceMotion) {
-    document.addEventListener('mousemove', function (e) {
-      var cx = window.innerWidth / 2;
-      var cy = window.innerHeight / 2;
-      var dx = (e.clientX - cx) / cx;
-      var dy = (e.clientY - cy) / cy;
-      heroInner.style.transform =
-        'rotateY(' + (dx * 6).toFixed(2) + 'deg) rotateX(' + (-dy * 4).toFixed(2) + 'deg)';
-    });
-    document.addEventListener('mouseleave', function () {
-      heroInner.style.transform = '';
-    });
-  }
-
-  /* ── Scroll reveal ── */
-  if (!reduceMotion) {
-    var reveals = document.querySelectorAll('.reveal');
-    var io = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (en) {
-          if (en.isIntersecting) {
-            en.target.classList.add('in-view');
-            io.unobserve(en.target);
-          }
-        });
-      },
-      { rootMargin: '0px 0px -8% 0px', threshold: 0.08 }
+    const mesh = new THREE.Mesh(g, m);
+    mesh.position.set(
+      (Math.random() - 0.5) * 16,
+      (Math.random() - 0.5) * 12,
+      (Math.random() - 0.5) * 8 - 2
     );
-    reveals.forEach(function (el) {
-      io.observe(el);
-    });
-  } else {
-    document.querySelectorAll('.reveal').forEach(function (el) {
-      el.classList.add('in-view');
-    });
+    mesh.userData = {
+      rx: (Math.random() - 0.5) * 0.008,
+      ry: (Math.random() - 0.5) * 0.010,
+      floatSpeed:  Math.random() * 0.0008 + 0.0003,
+      floatOffset: Math.random() * Math.PI * 2,
+    };
+    shapes.push(mesh);
+    scene.add(mesh);
   }
 
-  /* ── Background canvas: depth grid + sparks ── */
-  var bg = document.getElementById('bg-canvas');
-  if (bg && !reduceMotion) {
-    var bctx = bg.getContext('2d');
-    var stars = [];
-    var nStars = Math.min(120, Math.floor(window.innerWidth / 12));
+  /* Subtle grid plane */
+  const gridHelper = new THREE.GridHelper(40, 40, 0x003330, 0x001a18);
+  gridHelper.position.z = -8;
+  gridHelper.rotation.x = Math.PI / 2;
+  scene.add(gridHelper);
 
-    function resizeBg() {
-      bg.width = window.innerWidth * Math.min(window.devicePixelRatio || 1, 2);
-      bg.height = window.innerHeight * Math.min(window.devicePixelRatio || 1, 2);
-      bg.style.width = window.innerWidth + 'px';
-      bg.style.height = window.innerHeight + 'px';
-    }
-    resizeBg();
-    for (var i = 0; i < nStars; i++) {
-      stars.push({
-        x: Math.random(),
-        y: Math.random(),
-        z: Math.random(),
-        s: Math.random() * 2 + 0.5,
-        v: Math.random() * 0.15 + 0.02
-      });
-    }
+  /* Mouse parallax */
+  let mouseX = 0, mouseY = 0;
+  document.addEventListener('mousemove', e => {
+    mouseX = (e.clientX / window.innerWidth  - 0.5) * 2;
+    mouseY = -(e.clientY / window.innerHeight - 0.5) * 2;
+  });
 
-    var t0 = performance.now();
-    function drawBg(now) {
-      var t = (now - t0) * 0.001;
-      var w = bg.width;
-      var h = bg.height;
-      var light = isLightTheme();
-      bctx.fillStyle = light ? '#e8f2f3' : '#000000';
-      bctx.fillRect(0, 0, w, h);
-      bctx.strokeStyle = light ? 'rgba(0, 121, 107, 0.07)' : 'rgba(0, 255, 231, 0.04)';
-      var step = 48 * (window.devicePixelRatio || 1);
-      var off = (t * 18) % step;
-      bctx.beginPath();
-      for (var gx = -step + off; gx < w + step; gx += step) {
-        bctx.moveTo(gx, 0);
-        bctx.lineTo(gx, h);
-      }
-      for (var gy = -step + off * 0.7; gy < h + step; gy += step) {
-        bctx.moveTo(0, gy);
-        bctx.lineTo(w, gy);
-      }
-      bctx.stroke();
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
 
-      for (var j = 0; j < stars.length; j++) {
-        var st = stars[j];
-        st.y += st.v * 0.00035;
-        if (st.y > 1) st.y = 0;
-        var px = st.x * w;
-        var py = (st.y % 1) * h;
-        var alpha = 0.15 + st.z * 0.55;
-        if (light) {
-          bctx.fillStyle = 'rgba(0, 105, 96, ' + (alpha * 0.55) + ')';
-        } else {
-          bctx.fillStyle = 'rgba(0, 255, 231, ' + alpha + ')';
-        }
-        bctx.beginPath();
-        bctx.arc(px, py, st.s * (window.devicePixelRatio || 1), 0, Math.PI * 2);
-        bctx.fill();
-      }
-      requestAnimationFrame(drawBg);
-    }
-    requestAnimationFrame(drawBg);
-    window.addEventListener('resize', resizeBg);
+  let t = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    t += 0.008;
+
+    points.rotation.y += 0.0001;
+    points.rotation.x += 0.00005;
+
+    camera.position.x += (mouseX * 0.25 - camera.position.x) * 0.02;
+    camera.position.y += (mouseY * 0.18 - camera.position.y) * 0.02;
+
+    shapes.forEach(s => {
+      s.rotation.x += s.userData.rx;
+      s.rotation.y += s.userData.ry;
+      s.position.y += Math.sin(t + s.userData.floatOffset) * s.userData.floatSpeed;
+    });
+
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
+
+
+/* ─────────────────────────────────────
+   3D CARD CAROUSEL (Three.js)
+   Black & Cyan theme
+───────────────────────────────────── */
+(function initCardScene() {
+  const canvas = document.getElementById('card-canvas');
+
+  /* Wait for layout paint so clientWidth/Height are real */
+  function getSize() {
+    return { W: canvas.clientWidth, H: canvas.clientHeight };
   }
 
-  /* ── Three.js centerpiece ── */
-  var canvas = document.getElementById('card-canvas');
-  var applyThemeThree = null;
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
 
-  if (canvas && typeof THREE !== 'undefined') {
-    var renderer = new THREE.WebGLRenderer({
-      canvas: canvas,
-      antialias: true,
-      alpha: true,
-      powerPreference: 'high-performance'
-    });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    if (renderer.outputColorSpace !== undefined) {
-      renderer.outputColorSpace = THREE.SRGBColorSpace;
-    }
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
+  let { W, H } = getSize();
+  renderer.setSize(W, H);
 
-    var scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x020608, 0.055);
+  const scene  = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 100);
+  camera.position.set(0, 1.2, 7);
+  camera.lookAt(0, 0, 0);
 
-    var camera = new THREE.PerspectiveCamera(48, 1, 0.1, 200);
-    camera.position.set(0, 0.4, 9.2);
+  /* Lighting — cyan accent */
+  scene.add(new THREE.AmbientLight(0x001a18, 0.8));
 
-    var main = new THREE.Group();
-    scene.add(main);
+  const cyanLight = new THREE.DirectionalLight(0x00ffe7, 1.0);
+  cyanLight.position.set(4, 8, 5);
+  cyanLight.castShadow = true;
+  scene.add(cyanLight);
 
-    var cyan = 0x00ffe7;
-    var magenta = 0xff2bd6;
-    var violet = 0x7c3aed;
+  const cyanPoint = new THREE.PointLight(0x00ffe7, 2.5, 22);
+  cyanPoint.position.set(-5, 2, 4);
+  scene.add(cyanPoint);
 
-    var knotGeo = new THREE.TorusKnotGeometry(1.05, 0.32, 180, 16, 2, 3);
-    var knotMat = new THREE.MeshStandardMaterial({
-      color: 0x061016,
-      metalness: 0.9,
-      roughness: 0.18,
-      emissive: new THREE.Color(cyan),
-      emissiveIntensity: 0.35
-    });
-    var knot = new THREE.Mesh(knotGeo, knotMat);
-    main.add(knot);
+  const rimLight = new THREE.PointLight(0x004d44, 1.5, 18);
+  rimLight.position.set(0, -4, 5);
+  scene.add(rimLight);
 
-    var wire = new THREE.Mesh(
-      knotGeo,
-      new THREE.MeshBasicMaterial({ color: cyan, wireframe: true, transparent: true, opacity: 0.12 })
-    );
-    wire.scale.setScalar(1.02);
-    main.add(wire);
+  /* Ground */
+  const groundGeo = new THREE.PlaneGeometry(22, 22);
+  const groundMat = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 1 });
+  const ground    = new THREE.Mesh(groundGeo, groundMat);
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.y = -1.6;
+  ground.receiveShadow = true;
+  scene.add(ground);
 
-    var icoGeo = new THREE.IcosahedronGeometry(0.22, 0);
-    var shardGroup = new THREE.Group();
-    for (var s = 0; s < 14; s++) {
-      var mat = new THREE.MeshStandardMaterial({
-        color: s % 2 ? violet : 0x0a1518,
-        metalness: 0.85,
-        roughness: 0.25,
-        emissive: new THREE.Color(s % 3 === 0 ? magenta : cyan),
-        emissiveIntensity: 0.45
-      });
-      var mesh = new THREE.Mesh(icoGeo, mat);
-      var a = (s / 14) * Math.PI * 2;
-      var r = 2.35 + (s % 3) * 0.15;
-      mesh.position.set(Math.cos(a) * r, Math.sin(a * 2.1) * 0.5, Math.sin(a) * r);
-      mesh.userData.phase = s * 0.7;
-      shardGroup.add(mesh);
-    }
-    main.add(shardGroup);
+  const grid = new THREE.GridHelper(22, 32, 0x003330, 0x001a18);
+  grid.position.y = -1.59;
+  scene.add(grid);
 
-    var ringGeo = new THREE.TorusGeometry(3.1, 0.02, 12, 100);
-    var ringMat = new THREE.MeshBasicMaterial({ color: cyan, transparent: true, opacity: 0.35 });
-    var ringMesh = new THREE.Mesh(ringGeo, ringMat);
-    ringMesh.rotation.x = Math.PI / 2.35;
-    main.add(ringMesh);
+  /* Card data — all cyan palette */
+  const cardData = [
+    { label: 'CS Student',     color: 0x00ffe7, emissive: 0x00ffe7 },
+    { label: 'SZABIST Karachi',color: 0x00c9b6, emissive: 0x00c9b6 },
+    { label: 'BSCS · 4A',     color: 0x00ffe7, emissive: 0x00ffe7 },
+    { label: 'Builder',        color: 0x00b8a6, emissive: 0x00b8a6 },
+    { label: 'R.N 2412115',   color: 0x00ffe7, emissive: 0x00ffe7 },
+  ];
 
-    var ring2 = new THREE.Mesh(
-      ringGeo,
-      new THREE.MeshBasicMaterial({ color: magenta, transparent: true, opacity: 0.2 })
-    );
-    ring2.scale.setScalar(1.12);
-    ring2.rotation.x = Math.PI / 2.1;
-    ring2.rotation.z = 0.4;
-    main.add(ring2);
+  const cards = [];
+  cardData.forEach((data, i) => {
+    const group = new THREE.Group();
+    const angle  = (i / cardData.length) * Math.PI * 2;
+    const radius = 2.8;
 
-    var ambient = new THREE.AmbientLight(0x1a3035, 0.6);
-    scene.add(ambient);
-    var p1 = new THREE.PointLight(cyan, 2.2, 20, 2);
-    p1.position.set(3, 2, 4);
-    scene.add(p1);
-    var p2 = new THREE.PointLight(magenta, 1.8, 18, 2);
-    p2.position.set(-3.5, -1, 3);
-    scene.add(p2);
-    var p3 = new THREE.PointLight(violet, 1.2, 16, 2);
-    p3.position.set(0, 3.5, -2);
-    scene.add(p3);
-
-    var clock = new THREE.Clock();
-    var targetRotY = 0;
-    var targetRotX = 0;
-    var dragging = false;
-    var lx = 0;
-    var ly = 0;
-
-    if (finePointer) {
-      canvas.addEventListener('pointerdown', function (e) {
-        dragging = true;
-        lx = e.clientX;
-        ly = e.clientY;
-        canvas.setPointerCapture(e.pointerId);
-      });
-      canvas.addEventListener('pointerup', function (e) {
-        dragging = false;
-        try {
-          canvas.releasePointerCapture(e.pointerId);
-        } catch (err) {}
-      });
-      canvas.addEventListener('pointermove', function (e) {
-        if (!dragging) return;
-        var dx = e.clientX - lx;
-        var dy = e.clientY - ly;
-        lx = e.clientX;
-        ly = e.clientY;
-        targetRotY += dx * 0.005;
-        targetRotX += dy * 0.003;
-        targetRotX = Math.max(-0.65, Math.min(0.65, targetRotX));
-      });
-    }
-
-    function resize3d() {
-      var rect = canvas.getBoundingClientRect();
-      var w = Math.max(1, rect.width);
-      var h = Math.max(1, rect.height);
-      renderer.setSize(w, h, false);
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-    }
-    resize3d();
-    window.addEventListener('resize', resize3d);
-
-    var scrollY = 0;
-    window.addEventListener(
-      'scroll',
-      function () {
-        scrollY = window.scrollY || 0;
-      },
-      { passive: true }
+    group.position.set(
+      Math.cos(angle) * radius,
+      0,
+      Math.sin(angle) * radius - 1
     );
 
-    var cyanDark = 0x009688;
-    var magentaDark = 0xc2189a;
-    var violetDark = 0x5b21b6;
+    /* Card body */
+    const cardMesh = new THREE.Mesh(
+      new THREE.BoxGeometry(1.7, 1.0, 0.06),
+      new THREE.MeshStandardMaterial({ color: 0x040d0d, roughness: 0.15, metalness: 0.8 })
+    );
+    cardMesh.castShadow = true;
+    group.add(cardMesh);
 
-    applyThemeThree = function (light) {
-      if (light) {
-        scene.fog = new THREE.FogExp2(0xe4eef0, 0.032);
-        renderer.toneMappingExposure = 0.95;
-        knotMat.color.setHex(0x8fb8b4);
-        knotMat.metalness = 0.65;
-        knotMat.roughness = 0.28;
-        knotMat.emissive.setHex(cyanDark);
-        knotMat.emissiveIntensity = 0.22;
-        wire.material.color.setHex(cyanDark);
-        wire.material.opacity = 0.18;
-        ringMat.color.setHex(cyanDark);
-        ringMat.opacity = 0.42;
-        ring2.material.color.setHex(magentaDark);
-        ring2.material.opacity = 0.28;
-        ambient.color.setHex(0xc5d9d8);
-        ambient.intensity = 0.85;
-        p1.color.setHex(cyanDark);
-        p1.intensity = 1.35;
-        p2.color.setHex(magentaDark);
-        p2.intensity = 1.1;
-        p3.color.setHex(violetDark);
-        p3.intensity = 0.85;
-        shardGroup.children.forEach(function (ch, idx) {
-          ch.material.color.setHex(idx % 2 ? violetDark : 0x5a7a78);
-          ch.material.emissive.setHex(idx % 3 === 0 ? magentaDark : cyanDark);
-          ch.material.emissiveIntensity = 0.32;
-        });
-      } else {
-        scene.fog = new THREE.FogExp2(0x020608, 0.055);
-        renderer.toneMappingExposure = 1.15;
-        knotMat.color.setHex(0x061016);
-        knotMat.metalness = 0.9;
-        knotMat.roughness = 0.18;
-        knotMat.emissive.setHex(cyan);
-        knotMat.emissiveIntensity = 0.35;
-        wire.material.color.setHex(cyan);
-        wire.material.opacity = 0.12;
-        ringMat.color.setHex(cyan);
-        ringMat.opacity = 0.35;
-        ring2.material.color.setHex(magenta);
-        ring2.material.opacity = 0.2;
-        ambient.color.setHex(0x1a3035);
-        ambient.intensity = 0.6;
-        p1.color.setHex(cyan);
-        p1.intensity = 2.2;
-        p2.color.setHex(magenta);
-        p2.intensity = 1.8;
-        p3.color.setHex(violet);
-        p3.intensity = 1.2;
-        shardGroup.children.forEach(function (ch, idx) {
-          ch.material.color.setHex(idx % 2 ? violet : 0x0a1518);
-          ch.material.emissive.setHex(idx % 3 === 0 ? magenta : cyan);
-          ch.material.emissiveIntensity = 0.45;
-        });
-      }
+    /* Cyan top edge */
+    const edgeMesh = new THREE.Mesh(
+      new THREE.BoxGeometry(1.71, 0.04, 0.07),
+      new THREE.MeshStandardMaterial({
+        color: data.color,
+        emissive: data.emissive,
+        emissiveIntensity: 0.8,
+      })
+    );
+    edgeMesh.position.y = 0.48;
+    group.add(edgeMesh);
+
+    /* Cyan bottom edge */
+    const edgeB = edgeMesh.clone();
+    edgeB.position.y = -0.48;
+    edgeB.material = edgeMesh.material.clone();
+    edgeB.material.emissiveIntensity = 0.3;
+    group.add(edgeB);
+
+    /* Glow aura */
+    const glowMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(0.55, 16, 16),
+      new THREE.MeshStandardMaterial({
+        color: data.color,
+        emissive: data.emissive,
+        emissiveIntensity: 0.1,
+        transparent: true,
+        opacity: 0.12,
+      })
+    );
+    glowMesh.position.z = -0.35;
+    group.add(glowMesh);
+
+    group.rotation.y = -angle + Math.PI;
+    group.userData = {
+      angle,
+      floatOffset: i * 1.3,
+      origY: 0,
     };
 
-    applyThemeThree(isLightTheme());
+    cards.push(group);
+    scene.add(group);
+  });
 
-    function animate() {
-      requestAnimationFrame(animate);
-      if (reduceMotion) {
-        renderer.render(scene, camera);
-        return;
-      }
-      var t = clock.getElapsedTime();
-      var ease = 1;
+  /* Central icosahedron — cyan metallic */
+  const icoGeo = new THREE.IcosahedronGeometry(0.72, 1);
+  const icoMat = new THREE.MeshStandardMaterial({
+    color: 0x003330,
+    emissive: 0x00ffe7,
+    emissiveIntensity: 0.25,
+    roughness: 0.05,
+    metalness: 1.0,
+  });
+  const icoMesh = new THREE.Mesh(icoGeo, icoMat);
+  icoMesh.castShadow = true;
+  scene.add(icoMesh);
 
-      main.rotation.y += (targetRotY - main.rotation.y) * 0.06 * ease;
-      main.rotation.x += (targetRotX - main.rotation.x) * 0.06 * ease;
-      if (!dragging && ease) {
-        targetRotY += 0.0018;
-      }
+  /* Wireframe overlay */
+  const wireMesh = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(0.74, 1),
+    new THREE.MeshBasicMaterial({ color: 0x00ffe7, wireframe: true, transparent: true, opacity: 0.2 })
+  );
+  scene.add(wireMesh);
 
-      knot.rotation.x = t * 0.31;
-      knot.rotation.y = t * 0.22;
-      wire.rotation.copy(knot.rotation);
+  /* ── Drag interaction ── */
+  let targetRotY  = 0;
+  let currentRotY = 0;
+  let isDragging  = false;
+  let lastX       = 0;
 
-      shardGroup.rotation.y = t * 0.15;
-      shardGroup.children.forEach(function (ch, idx) {
-        ch.position.y += Math.sin(t * 1.4 + ch.userData.phase) * 0.0012;
-        ch.rotation.x = t * 0.5 + idx;
-        ch.rotation.z = t * 0.35;
-      });
+  canvas.addEventListener('mousedown',  e => { isDragging = true; lastX = e.clientX; });
+  window.addEventListener('mouseup',    ()  => { isDragging = false; });
+  canvas.addEventListener('mousemove',  e => {
+    if (!isDragging) return;
+    targetRotY += (e.clientX - lastX) * 0.01;
+    lastX = e.clientX;
+  });
 
-      ringMesh.rotation.z = t * 0.08;
-      ring2.rotation.z = -t * 0.06 + 0.4;
+  canvas.addEventListener('touchstart', e => { isDragging = true; lastX = e.touches[0].clientX; }, { passive: true });
+  window.addEventListener('touchend',   ()  => { isDragging = false; });
+  canvas.addEventListener('touchmove',  e => {
+    if (!isDragging) return;
+    targetRotY += (e.touches[0].clientX - lastX) * 0.01;
+    lastX = e.touches[0].clientX;
+  }, { passive: true });
 
-      var scrollBoost = Math.min(1, scrollY / 1400);
-      camera.position.z = 9.2 - scrollBoost * 1.4;
-      p1.position.x = 3 + Math.sin(t * 0.7) * 1.2;
-      p1.position.z = 4 + Math.cos(t * 0.5) * 0.8;
-      p2.position.x = -3.5 + Math.cos(t * 0.55) * 1.1;
-      p3.position.y = 3.5 + Math.sin(t * 0.9) * 0.6;
+  /* ── Resize ── */
+  window.addEventListener('resize', () => {
+    const { W, H } = getSize();
+    camera.aspect = W / H;
+    camera.updateProjectionMatrix();
+    renderer.setSize(W, H);
+  });
 
-      knotMat.emissiveIntensity =
-        (isLightTheme() ? 0.18 : 0.28) + scrollBoost * (isLightTheme() ? 0.2 : 0.35);
+  /* ── Animation loop ── */
+  let t = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    t += 0.01;
 
-      renderer.render(scene, camera);
-    }
-    animate();
+    currentRotY += (targetRotY - currentRotY) * 0.05;
+    if (!isDragging) targetRotY += 0.004;
+
+    cards.forEach((group, i) => {
+      const floatY = Math.sin(t + group.userData.floatOffset) * 0.14;
+      group.position.y = group.userData.origY + floatY;
+      group.rotation.x = Math.sin(t * 0.4 + i) * 0.04;
+
+      const angle = group.userData.angle + currentRotY;
+      group.position.x = Math.cos(angle) * 2.8;
+      group.position.z = Math.sin(angle) * 2.8 - 1;
+      group.rotation.y = -angle + Math.PI;
+    });
+
+    icoMesh.rotation.x = t * 0.35;
+    icoMesh.rotation.y = t * 0.55;
+    wireMesh.rotation.x = t * 0.35;
+    wireMesh.rotation.y = t * 0.55;
+
+    /* Orbit cyan point light */
+    cyanPoint.position.x = Math.sin(t * 0.45) * 6;
+    cyanPoint.position.z = Math.cos(t * 0.45) * 6;
+
+    renderer.render(scene, camera);
   }
+  animate();
+})();
 
-  window.addEventListener('portfoliotheme', function (e) {
-    if (applyThemeThree) {
-      applyThemeThree(e.detail.theme === 'light');
+
+/* ─────────────────────────────────────
+   SCROLL REVEAL
+───────────────────────────────────── */
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity  = '1';
+      e.target.style.transform = 'translateY(0)';
     }
   });
-})();
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.skill-card, .project-card').forEach(el => {
+  el.style.opacity   = '0';
+  el.style.transform = 'translateY(24px)';
+  el.style.transition = 'opacity 0.55s ease, transform 0.55s ease, background 0.3s, border-color 0.3s, box-shadow 0.3s';
+  revealObserver.observe(el);
+});
