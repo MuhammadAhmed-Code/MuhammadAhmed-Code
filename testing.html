@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 12 – Instruction Sets: 100 MCQs</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; color: #222; padding: 30px 20px; }
+  h1 { text-align: center; color: #4a1a6e; margin-bottom: 6px; font-size: 1.8rem; }
+  .subtitle { text-align: center; color: #666; margin-bottom: 30px; font-size: 0.95rem; }
+  .controls { display: flex; gap: 12px; justify-content: center; margin-bottom: 28px; flex-wrap: wrap; }
+  .controls button {
+    padding: 9px 22px; border: none; border-radius: 6px; cursor: pointer;
+    font-size: 0.9rem; font-weight: 600; transition: background 0.2s;
+  }
+  #checkBtn  { background: #4a1a6e; color: #fff; }
+  #checkBtn:hover { background: #6b2a99; }
+  #resetBtn  { background: #e0e0e0; color: #333; }
+  #resetBtn:hover { background: #c8c8c8; }
+  #score { font-weight: 700; font-size: 1.1rem; color: #2e7d32; background: #e8f5e9; padding: 9px 20px; border-radius: 6px; display: none; }
+
+  .question-card {
+    background: #fff; border-radius: 10px; padding: 20px 24px;
+    margin-bottom: 18px; box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+    border-left: 5px solid #4a1a6e;
+  }
+  .question-card.correct { border-left-color: #2e7d32; background: #f1fff3; }
+  .question-card.wrong   { border-left-color: #c62828; background: #fff5f5; }
+
+  .q-number { font-size: 0.75rem; color: #888; margin-bottom: 4px; text-transform: uppercase; letter-spacing: .05em; }
+  .q-text { font-weight: 600; margin-bottom: 14px; line-height: 1.5; }
+
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .option label {
+    display: flex; align-items: flex-start; gap: 10px; cursor: pointer;
+    padding: 8px 12px; border-radius: 6px; border: 1.5px solid #ddd;
+    transition: border-color 0.15s, background 0.15s; line-height: 1.4;
+  }
+  .option label:hover { border-color: #4a1a6e; background: #f9f0ff; }
+  .option input { margin-top: 2px; accent-color: #4a1a6e; flex-shrink: 0; }
+
+  .feedback { margin-top: 10px; font-size: 0.88rem; font-weight: 600; display: none; }
+  .feedback.show { display: block; }
+  .feedback.correct-fb { color: #2e7d32; }
+  .feedback.wrong-fb   { color: #c62828; }
+
+  .correct-option label { background: #e8f5e9 !important; border-color: #2e7d32 !important; font-weight: 600; }
+  .wrong-option   label { background: #ffebee !important; border-color: #c62828 !important; }
+
+  @media(max-width:600px) { body { padding: 16px 10px; } h1 { font-size: 1.3rem; } }
+</style>
+</head>
+<body>
+
+<h1>Chapter 12 — Instruction Sets</h1>
+<p class="subtitle">Characteristics and Functions &nbsp;|&nbsp; COA 10th Edition &nbsp;|&nbsp; SZABIST &nbsp;|&nbsp; 100 MCQs</p>
+
+<div class="controls">
+  <button id="checkBtn" onclick="checkAll()">Submit &amp; Check Score</button>
+  <button id="resetBtn" onclick="resetAll()">Reset</button>
+  <span id="score"></span>
+</div>
+
+<div id="quiz"></div>
+
+<script>
+const questions = [
+  // ── Machine Instruction Characteristics ──────────────────────────────
+  {
+    q: "What are the instructions executed by the processor collectively called?",
+    opts: ["Source code", "Machine instructions or computer instructions", "Assembly mnemonics", "Microcode only"],
+    ans: 1
+  },
+  {
+    q: "The complete collection of different instructions a processor can execute is called the:",
+    opts: ["Opcode table", "Instruction set", "Operand list", "Control unit"],
+    ans: 1
+  },
+  {
+    q: "Which element of a machine instruction specifies the operation to be performed?",
+    opts: ["Source operand reference", "Next instruction reference", "Operation code (opcode)", "Result operand reference"],
+    ans: 2
+  },
+  {
+    q: "The 'next instruction reference' field in a machine instruction tells the processor:",
+    opts: ["The value of the operand", "Where to fetch the next instruction after execution", "The type of data to be used", "The register number to use"],
+    ans: 1
+  },
+  {
+    q: "In the instruction ADD R1, X, Y — what is the result operand?",
+    opts: ["X", "Y", "R1", "PC+1"],
+    ans: 2
+  },
+  {
+    q: "In ADD R1, X, Y — what are the source operands?",
+    opts: ["R1 and X", "X and Y", "R1 and Y", "R1 only"],
+    ans: 1
+  },
+  {
+    q: "After ADD R1, X, Y executes, the next instruction reference is typically:",
+    opts: ["R1", "Y", "X", "PC + 1"],
+    ans: 3
+  },
+  {
+    q: "The operation code in a machine instruction is specified by a:",
+    opts: ["Symbolic name", "Binary code", "Decimal number", "Hexadecimal string only"],
+    ans: 1
+  },
+  {
+    q: "Which of the following is NOT one of the four elements of a machine instruction?",
+    opts: ["Opcode", "Source operand reference", "Clock frequency", "Next instruction reference"],
+    ans: 2
+  },
+
+  // ── Instruction Cycle ──────────────────────────────────────────────
+  {
+    q: "The correct order of phases in the instruction cycle is:",
+    opts: ["Execute → Fetch → Decode → Read", "Fetch → Decode → Read → Execute", "Decode → Fetch → Execute → Read", "Read → Fetch → Decode → Execute"],
+    ans: 1
+  },
+  {
+    q: "During which phase does the CPU retrieve an instruction from memory?",
+    opts: ["Decode", "Execute", "Fetch", "Read"],
+    ans: 2
+  },
+  {
+    q: "Reading the effective address from memory occurs when the instruction has a(n):",
+    opts: ["Direct address", "Immediate value", "Indirect address", "Register operand"],
+    ans: 2
+  },
+  {
+    q: "In the Instruction Cycle State Diagram, 'Operand fetch' can loop back for what type of data?",
+    opts: ["Integer arrays", "String or vector data", "BCD numbers", "Stack frames"],
+    ans: 1
+  },
+  {
+    q: "Which phase in the instruction cycle stores the result back to a location?",
+    opts: ["Instruction fetch", "Operand fetch", "Data operation", "Operand store"],
+    ans: 3
+  },
+
+  // ── Instruction Representation ──────────────────────────────────────
+  {
+    q: "Inside the computer, each instruction is represented as a sequence of:",
+    opts: ["Characters", "Decimal digits", "Bits", "Words"],
+    ans: 2
+  },
+  {
+    q: "Abbreviated symbolic names used to represent opcodes are called:",
+    opts: ["Registers", "Mnemonics", "Operands", "Identifiers"],
+    ans: 1
+  },
+  {
+    q: "In a 16-bit instruction format with 4-bit opcode, how many bits remain for operand fields?",
+    opts: ["8", "10", "12", "14"],
+    ans: 2
+  },
+  {
+    q: "Which mnemonic represents 'Store data to memory'?",
+    opts: ["LOAD", "ADD", "STOR", "MOV"],
+    ans: 2
+  },
+  {
+    q: "Which mnemonic represents 'Load data from memory'?",
+    opts: ["STOR", "LOAD", "PUSH", "SUB"],
+    ans: 1
+  },
+  {
+    q: "Given ADD R, Y where Y=20 and R=10, what is the result in R?",
+    opts: ["10", "20", "30", "200"],
+    ans: 2
+  },
+  {
+    q: "Each symbolic opcode has a:",
+    opts: ["Variable binary representation", "Fixed binary representation", "Decimal equivalent only", "No binary representation"],
+    ans: 1
+  },
+  {
+    q: "In the 16-bit instruction 0010 | 010111 | 110010, which bits represent the opcode?",
+    opts: ["110010 (LSB)", "010111", "0010 (MSB)", "All 16 bits"],
+    ans: 2
+  },
+
+  // ── Instruction Types ──────────────────────────────────────────────
+  {
+    q: "Which of the four instruction type categories handles movement of data into or out of registers?",
+    opts: ["Data processing", "Control", "Data storage", "Data movement"],
+    ans: 3
+  },
+  {
+    q: "Arithmetic and Logic instructions fall under which category?",
+    opts: ["Data movement", "Data processing", "Data storage", "Control"],
+    ans: 1
+  },
+  {
+    q: "Branch and test instructions belong to which instruction type category?",
+    opts: ["Data storage", "Data movement", "Data processing", "Control"],
+    ans: 3
+  },
+  {
+    q: "I/O instructions are classified under which instruction type?",
+    opts: ["Data processing", "Control", "Data movement", "Data storage"],
+    ans: 2
+  },
+  {
+    q: "Logic (Boolean) instructions operate on the bits of a word:",
+    opts: ["As numbers", "As characters", "As bits rather than numbers", "As floating-point values"],
+    ans: 2
+  },
+  {
+    q: "Test instructions are used to test:",
+    opts: ["The opcode validity", "The value of a data word or status of a computation", "The memory address range", "The register count"],
+    ans: 1
+  },
+  {
+    q: "Branch instructions jump to a different set of instructions based on:",
+    opts: ["The program size", "The decision made (condition)", "The number of registers", "The clock speed"],
+    ans: 1
+  },
+
+  // ── Number of Addresses ──────────────────────────────────────────
+  {
+    q: "In a three-address instruction OP A, B, C, the interpretation is:",
+    opts: ["A ← A OP B", "A ← B OP C", "B ← A OP C", "C ← A OP B"],
+    ans: 1
+  },
+  {
+    q: "In a two-address instruction OP A, B, the interpretation is:",
+    opts: ["A ← B OP A", "B ← A OP B", "A ← A OP B", "B ← B OP A"],
+    ans: 2
+  },
+  {
+    q: "In a one-address instruction OP A, the interpretation involves:",
+    opts: ["The stack top", "A general-purpose register pair", "The accumulator (AC)", "Two memory locations"],
+    ans: 2
+  },
+  {
+    q: "Zero-address instructions are applicable to a special memory organization called a:",
+    opts: ["Queue", "Stack", "Heap", "Cache"],
+    ans: 1
+  },
+  {
+    q: "A stack is a _______ set of locations.",
+    opts: ["First-in-first-out", "Random access", "Last-in-first-out", "Priority-based"],
+    ans: 2
+  },
+  {
+    q: "For zero-address instructions, the top two elements referenced are typically in:",
+    opts: ["Main memory", "Cache", "Processor registers", "Secondary storage"],
+    ans: 2
+  },
+  {
+    q: "In Table 12.1, the symbol T represents:",
+    opts: ["Accumulator", "Top of stack", "Temporary register", "Transfer register"],
+    ans: 1
+  },
+  {
+    q: "Fewer addresses per instruction results in:",
+    opts: ["Shorter programs", "More complex processor design", "Shorter instruction length", "Faster individual execution always"],
+    ans: 2
+  },
+  {
+    q: "A disadvantage of fewer addresses per instruction is:",
+    opts: ["Simpler hardware", "Shorter instruction length", "Longer and more complex programs", "Less memory usage"],
+    ans: 2
+  },
+  {
+    q: "INC A is an example of a _______ instruction.",
+    opts: ["Binary", "Ternary", "Unary", "Zero-address"],
+    ans: 2
+  },
+  {
+    q: "ADD A, B is an example of a _______ instruction.",
+    opts: ["Unary", "Binary", "Ternary", "Zero-address"],
+    ans: 1
+  },
+
+  // ── Instruction Set Design ──────────────────────────────────────
+  {
+    q: "Which is NOT one of the five fundamental design issues of an instruction set?",
+    opts: ["Operation repertoire", "Data types", "Clock speed", "Addressing modes"],
+    ans: 2
+  },
+  {
+    q: "'Operation repertoire' in instruction set design refers to:",
+    opts: ["The mode of addressing operands", "How many and which operations to provide", "The number of processor registers", "The instruction length in bits"],
+    ans: 1
+  },
+  {
+    q: "The 'Addressing' design issue concerns:",
+    opts: ["Instruction length in bits", "Number of registers", "The mode by which an operand address is specified", "Types of data"],
+    ans: 2
+  },
+  {
+    q: "Instruction set design is very complex because it affects:",
+    opts: ["Only the compiler", "Only the ALU", "Many aspects of the computer system", "Only the cache memory"],
+    ans: 2
+  },
+
+  // ── Types of Operands ──────────────────────────────────────────
+  {
+    q: "Which of the following is NOT one of the four types of operands?",
+    opts: ["Addresses", "Numbers", "Opcodes", "Logical data"],
+    ans: 2
+  },
+  {
+    q: "The four types of operands are:",
+    opts: ["Addresses, Numbers, Characters, Logical Data", "Registers, Memory, Immediate, Stack", "Binary, Decimal, Hex, Octal", "Integer, Float, String, Pointer"],
+    ans: 0
+  },
+
+  // ── Numbers ──────────────────────────────────────────────────
+  {
+    q: "How many types of numerical data are common in computers?",
+    opts: ["Two", "Three", "Four", "Five"],
+    ans: 1
+  },
+  {
+    q: "Which of the following is NOT a common numerical data type in computers?",
+    opts: ["Binary integer", "Binary floating point", "Hexadecimal fixed point", "Decimal"],
+    ans: 2
+  },
+  {
+    q: "In packed decimal representation, each decimal digit is represented by a _______ code.",
+    opts: ["2-bit", "4-bit", "8-bit", "16-bit"],
+    ans: 1
+  },
+  {
+    q: "In packed decimal, how many digits are stored per byte?",
+    opts: ["One", "Two", "Four", "Eight"],
+    ans: 1
+  },
+  {
+    q: "The packed decimal code for 246 is:",
+    opts: ["0010 0100 0110", "0000 0010 0100 0110", "0100 0110 0010", "0110 0100 0010"],
+    ans: 1
+  },
+  {
+    q: "Numbers stored in a computer are limited to:",
+    opts: ["Only positive integers", "The magnitude representable and floating-point precision", "Only binary fixed-point values", "Unlimited range"],
+    ans: 1
+  },
+
+  // ── Characters ──────────────────────────────────────────────
+  {
+    q: "The most commonly used character code is called:",
+    opts: ["EBCDIC", "Unicode", "IRA / ASCII", "BCD"],
+    ans: 2
+  },
+  {
+    q: "IRA stands for:",
+    opts: ["Instruction Reference Architecture", "International Reference Alphabet", "Internal Register Address", "Indexed Register Array"],
+    ans: 1
+  },
+  {
+    q: "ASCII is used in the United States and stands for:",
+    opts: ["American Standard Code for Information Interchange", "Advanced System Code for Instruction Input", "Automated Standard Control for Integer Instructions", "American Symbolic Code for Integer Information"],
+    ans: 0
+  },
+  {
+    q: "The ASCII value of the character 'A' is:",
+    opts: ["48", "64", "65", "97"],
+    ans: 2
+  },
+  {
+    q: "The ASCII value of lowercase 'a' is:",
+    opts: ["65", "48", "64", "97"],
+    ans: 3
+  },
+  {
+    q: "EBCDIC is used on:",
+    opts: ["ARM processors", "IBM mainframes", "RISC systems", "x86 PCs"],
+    ans: 1
+  },
+  {
+    q: "EBCDIC stands for:",
+    opts: ["Enhanced Binary Coded Decimal Interchange Code", "Extended Binary Coded Decimal Interchange Code", "External Binary Control Data Instruction Code", "Expanded Binary Coded Data Interchange Code"],
+    ans: 1
+  },
+
+  // ── Logical Data ──────────────────────────────────────────
+  {
+    q: "An n-bit logical data unit consists of:",
+    opts: ["n bytes", "n 1-bit items, each 0 or 1", "n 4-bit groups", "n characters"],
+    ans: 1
+  },
+  {
+    q: "One advantage of the bit-oriented view is that memory can be used most efficiently for storing:",
+    opts: ["Floating-point arrays", "Arrays of Boolean or binary data items", "Character strings", "Packed decimal numbers"],
+    ans: 1
+  },
+  {
+    q: "To convert from IRA to packed decimal, you need to extract the _______ of each byte.",
+    opts: ["Leftmost 4 bits", "Rightmost 4 bits", "Middle 4 bits", "Sign bit"],
+    ans: 1
+  },
+
+  // ── Intel x86 Data Types ──────────────────────────────────────
+  {
+    q: "x86 architecture is classified as:",
+    opts: ["RISC", "CISC", "VLIW", "MIMD"],
+    ans: 1
+  },
+  {
+    q: "What is the size of a 'Word' in x86 architecture?",
+    opts: ["8-bit", "16-bit", "32-bit", "64-bit"],
+    ans: 1
+  },
+  {
+    q: "What is the size of a 'Double Word' in x86?",
+    opts: ["16-bit", "32-bit", "64-bit", "80-bit"],
+    ans: 1
+  },
+  {
+    q: "What is the size of a 'Quad Word' in x86?",
+    opts: ["32-bit", "64-bit", "80-bit", "128-bit"],
+    ans: 1
+  },
+  {
+    q: "The 80-bit extended precision floating-point in x86 is handled by:",
+    opts: ["MMX unit", "SSE unit", "x87 FPU", "ALU"],
+    ans: 2
+  },
+  {
+    q: "In x86, a 'Byte' is:",
+    opts: ["4 bits", "8 bits", "16 bits", "32 bits"],
+    ans: 1
+  },
+  {
+    q: "x86 integers use _______ for signed representation.",
+    opts: ["Sign-magnitude", "One's complement", "Two's complement", "Excess-128"],
+    ans: 2
+  },
+  {
+    q: "Data alignment in x86 memory improves:",
+    opts: ["Code readability", "Power consumption", "Performance compared to unaligned access", "Instruction count"],
+    ans: 2
+  },
+  {
+    q: "A 'Near pointer' in x86 represents:",
+    opts: ["A physical memory address", "A 16/32/64-bit effective address (offset within a segment)", "A segment selector", "An interrupt vector"],
+    ans: 1
+  },
+  {
+    q: "A 'Far pointer' in x86 consists of:",
+    opts: ["Only a 32-bit offset", "A 16-bit segment selector and an offset", "A 64-bit virtual address", "Two 16-bit offsets"],
+    ans: 1
+  },
+  {
+    q: "Packed SIMD data types in x86 are:",
+    opts: ["8-bit and 16-bit only", "Packed 64-bit and 128-bit data types", "32-bit integer only", "80-bit extended precision only"],
+    ans: 1
+  },
+  {
+    q: "MMX stands for:",
+    opts: ["Memory Management Extensions", "Multimedia Extensions", "Multiple Mode Execution", "Micro Machine Extensions"],
+    ans: 1
+  },
+  {
+    q: "SSE stands for:",
+    opts: ["Single-Stage Execution", "Streaming SIMD Extensions", "System Software Extension", "Stack Segment Extensions"],
+    ans: 1
+  },
+  {
+    q: "x86 'Bit field' is described as a contiguous sequence of bits that can begin at any bit position and can contain up to:",
+    opts: ["8 bits", "16 bits", "32 bits", "64 bits"],
+    ans: 2
+  },
+
+  // ── ARM Data Types ──────────────────────────────────────────────
+  {
+    q: "ARM stands for:",
+    opts: ["Automated RISC Machine", "Advanced RISC Machine", "Arithmetic Register Module", "Advanced Register Memory"],
+    ans: 1
+  },
+  {
+    q: "ARM uses a _______ architecture, meaning all data operations use registers.",
+    opts: ["Stack-based", "Load/store", "Memory-to-memory", "Accumulator-based"],
+    ans: 1
+  },
+  {
+    q: "ARM processor registers hold data at what size?",
+    opts: ["16 bits", "32 bits", "64 bits", "8 bits"],
+    ans: 1
+  },
+  {
+    q: "A halfword in ARM must be aligned beginning at:",
+    opts: ["Any address", "An odd address", "An even address", "A multiple of 4"],
+    ans: 2
+  },
+  {
+    q: "A word (32-bit) in ARM must begin at a multiple of:",
+    opts: ["2", "4", "8", "16"],
+    ans: 1
+  },
+  {
+    q: "ARM supports which data types?",
+    opts: ["8, 16, 32-bit", "8, 32, 64-bit only", "16, 32, 64-bit only", "4, 8, 16-bit only"],
+    ans: 0
+  },
+  {
+    q: "After loading data from memory in ARM, the data must be extended into 32 bits because:",
+    opts: ["ARM has no ALU", "The register size is 32 bits", "ARM uses big-endian only", "The cache only holds 32-bit values"],
+    ans: 1
+  },
+  {
+    q: "ARM is commonly used in:",
+    opts: ["Desktop servers and mainframes", "Mobile and embedded systems", "Supercomputers only", "GPU architectures only"],
+    ans: 1
+  },
+
+  // ── SISD/SIMD/MISD/MIMD ──────────────────────────────────────
+  {
+    q: "SISD stands for:",
+    opts: ["Single Instruction Single Data", "Simple Instruction Simple Data", "Single Index Simple Decode", "Single Instruction Stream Single Data stream"],
+    ans: 3
+  },
+  {
+    q: "SISD corresponds to which classical architecture?",
+    opts: ["Multiprocessor", "Processor Array", "Von Neumann Architecture", "Distributed system"],
+    ans: 2
+  },
+  {
+    q: "SIMD (Single Instruction, Multiple Data) corresponds to:",
+    opts: ["Von Neumann Architecture", "Processor Array", "Multiprocessor", "MISD"],
+    ans: 1
+  },
+  {
+    q: "MIMD (Multiple Instruction, Multiple Data) corresponds to:",
+    opts: ["Von Neumann Architecture", "Processor Array", "Multiprocessor", "Single-core CPU"],
+    ans: 2
+  },
+
+  // ── Types of Operations ──────────────────────────────────────
+  {
+    q: "Which operation transfers a word from processor to memory?",
+    opts: ["Load (fetch)", "Move", "Store", "Exchange"],
+    ans: 2
+  },
+  {
+    q: "Which operation transfers a word from memory to the processor?",
+    opts: ["Store", "Load (fetch)", "Push", "Pop"],
+    ans: 1
+  },
+  {
+    q: "The 'Exchange' operation does what?",
+    opts: ["Clears memory", "Swaps contents of source and destination", "Transfers a word of 0s", "Transfers a word of 1s"],
+    ans: 1
+  },
+  {
+    q: "The 'Push' data transfer instruction does what?",
+    opts: ["Transfers word from top of stack to destination", "Transfers word from source to top of stack", "Loads a word from memory", "Stores a word to memory"],
+    ans: 1
+  },
+  {
+    q: "Which arithmetic operation replaces an operand by its absolute value?",
+    opts: ["Negate", "Absolute", "Increment", "Complement"],
+    ans: 1
+  },
+  {
+    q: "The 'Negate' operation does what?",
+    opts: ["Adds 1 to operand", "Subtracts 1 from operand", "Changes the sign of the operand", "Clears the operand"],
+    ans: 2
+  },
+  {
+    q: "A 'Jump Conditional' instruction:",
+    opts: ["Always loads PC with the specified address", "Either loads PC with specified address or does nothing, based on condition", "Stops program execution", "Increments PC to skip next instruction"],
+    ans: 1
+  },
+  {
+    q: "The 'Halt' instruction:",
+    opts: ["Pauses until a condition is met", "Skips the next instruction", "Stops program execution", "Jumps to a subroutine"],
+    ans: 2
+  },
+  {
+    q: "Which instruction increments the PC to skip the next instruction?",
+    opts: ["Jump", "Halt", "Skip", "Return"],
+    ans: 2
+  },
+  {
+    q: "The 'Jump to Subroutine' instruction places current program control information in a known location then:",
+    opts: ["Halts execution", "Jumps to the specified address", "Returns to the caller", "Skips two instructions"],
+    ans: 1
+  },
+  {
+    q: "For Arithmetic instructions, the processor performs the function in the:",
+    opts: ["FPU only", "Control Unit", "ALU", "Cache controller"],
+    ans: 2
+  },
+  {
+    q: "Transfer of Control instructions update the:",
+    opts: ["Status register", "Stack pointer only", "Program counter", "Data register"],
+    ans: 2
+  },
+
+  // ── x86 Operation Types ──────────────────────────────────────
+  {
+    q: "The x86 instruction CALL does which of the following?",
+    opts: ["Pops return address and jumps", "Pushes return address then jumps to function", "Destroys the stack frame", "Allocates local variables"],
+    ans: 1
+  },
+  {
+    q: "The x86 ENTER instruction is used to:",
+    opts: ["Return control to calling function", "Reverse the stack frame", "Set up space for local variables (stack frame)", "Jump unconditionally"],
+    ans: 2
+  },
+  {
+    q: "The x86 LEAVE instruction:",
+    opts: ["Creates a new stack frame", "Reverses ENTER / destroys stack frame", "Saves all registers", "Issues an interrupt"],
+    ans: 1
+  },
+  {
+    q: "The x86 RETURN instruction does:",
+    opts: ["Creates a stack frame", "Allocates local variable space", "POPs return address and jumps to it", "Pushes the frame pointer"],
+    ans: 2
+  },
+
+  // ── x86 Status Flags ──────────────────────────────────────────
+  {
+    q: "The x86 Zero Flag (ZF) is set to 1 when:",
+    opts: ["An overflow occurs", "The result is negative", "The result of an operation is zero", "A carry occurs"],
+    ans: 2
+  },
+  {
+    q: "The Carry Flag (CF) in x86 indicates:",
+    opts: ["An overflow in signed arithmetic", "Even parity of LSB", "A carry or borrow out of the most significant bit after arithmetic", "The sign of the result"],
+    ans: 2
+  },
+  {
+    q: "The Overflow Flag (OF) in x86 indicates:",
+    opts: ["Unsigned carry", "Arithmetic overflow in signed (two's complement) operations", "Even parity", "Zero result"],
+    ans: 1
+  },
+  {
+    q: "The Sign Flag (SF) in x86 is set to 1 when the result is:",
+    opts: ["Zero", "Positive", "Negative", "Carrying"],
+    ans: 2
+  },
+  {
+    q: "The Parity Flag (PF) is set to 1 when the LSB of the result has:",
+    opts: ["Odd parity", "Even parity", "A carry", "No value"],
+    ans: 1
+  },
+  {
+    q: "The Auxiliary Carry Flag (AF) is used in:",
+    opts: ["Floating-point operations", "BCD (Binary Coded Decimal) arithmetic", "String operations", "Stack operations"],
+    ans: 1
+  },
+  {
+    q: "In x86 condition codes, 'E, Z' (ZF=1) represents:",
+    opts: ["Not equal", "Equal / Zero", "Overflow", "Sign negative"],
+    ans: 1
+  },
+  {
+    q: "The x86 condition 'G, NLE' tests for:",
+    opts: ["Less than (signed)", "Less than or equal", "Greater than / Not less than or equal (signed)", "Greater than or equal (unsigned)"],
+    ans: 2
+  },
+
+  // ── ARM Operation Types ──────────────────────────────────────
+  {
+    q: "Which of the following is an ARM operation type?",
+    opts: ["Far pointer access", "Load and store instructions", "Segment override", "Interrupt gate"],
+    ans: 1
+  },
+  {
+    q: "ARM does NOT include which of the following instruction categories?",
+    opts: ["Branch instructions", "Data-processing instructions", "Far pointer instructions", "Multiply instructions"],
+    ans: 2
+  },
+  {
+    q: "ARM Conditions for Conditional Instruction Execution: code 0000 (EQ) tests condition:",
+    opts: ["N = 1", "Z = 0", "Z = 1", "C = 1"],
+    ans: 2
+  },
+  {
+    q: "ARM condition code AL (1110) means:",
+    opts: ["Always (unconditional)", "Signed less than", "Not equal", "Carry clear"],
+    ans: 0
+  },
+  {
+    q: "ARM condition NE (0001) tests:",
+    opts: ["Z = 1", "Z = 0", "N = 1", "C = 1"],
+    ans: 1
+  },
+  {
+    q: "ARM condition GE (1010) means:",
+    opts: ["Unsigned higher", "Signed greater than or equal", "Minus/negative", "Carry set"],
+    ans: 1
+  }
+];
+
+// Shuffle options while preserving correct answer tracking
+function buildQuiz() {
+  const container = document.getElementById('quiz');
+  questions.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.id = `q${idx}`;
+
+    const opts = item.opts.map((o, i) => ({ text: o, original: i }));
+
+    card.innerHTML = `
+      <div class="q-number">Question ${idx + 1} of ${questions.length}</div>
+      <div class="q-text">${item.q}</div>
+      <div class="options" id="opts${idx}">
+        ${opts.map((o, i) => `
+          <div class="option" id="opt${idx}_${o.original}">
+            <label>
+              <input type="radio" name="q${idx}" value="${o.original}">
+              <span>${String.fromCharCode(65+i)}. ${o.text}</span>
+            </label>
+          </div>`).join('')}
+      </div>
+      <div class="feedback" id="fb${idx}"></div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function checkAll() {
+  let score = 0;
+  questions.forEach((item, idx) => {
+    const selected = document.querySelector(`input[name="q${idx}"]:checked`);
+    const card = document.getElementById(`q${idx}`);
+    const fb = document.getElementById(`fb${idx}`);
+
+    // disable all radios
+    document.querySelectorAll(`input[name="q${idx}"]`).forEach(r => r.disabled = true);
+
+    const correctOpt = document.getElementById(`opt${idx}_${item.ans}`);
+
+    if (selected) {
+      const val = parseInt(selected.value);
+      if (val === item.ans) {
+        score++;
+        card.classList.add('correct');
+        fb.textContent = '✔ Correct!';
+        fb.className = 'feedback show correct-fb';
+      } else {
+        card.classList.add('wrong');
+        fb.textContent = `✘ Wrong. Correct answer: ${String.fromCharCode(65 + item.ans)}. ${item.opts[item.ans]}`;
+        fb.className = 'feedback show wrong-fb';
+        document.getElementById(`opt${idx}_${val}`).classList.add('wrong-option');
+      }
+    } else {
+      card.classList.add('wrong');
+      fb.textContent = `⚠ Not answered. Correct: ${String.fromCharCode(65 + item.ans)}. ${item.opts[item.ans]}`;
+      fb.className = 'feedback show wrong-fb';
+    }
+    correctOpt.classList.add('correct-option');
+  });
+
+  const scoreEl = document.getElementById('score');
+  scoreEl.textContent = `Score: ${score} / ${questions.length} (${Math.round(score/questions.length*100)}%)`;
+  scoreEl.style.display = 'inline-block';
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function resetAll() {
+  document.getElementById('quiz').innerHTML = '';
+  document.getElementById('score').style.display = 'none';
+  buildQuiz();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+buildQuiz();
+</script>
+</body>
+</html>
